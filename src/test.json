@@ -1,0 +1,25 @@
+[
+  {
+    "id": 1,
+    "username": "73312752",
+    "password": "$2b$10$B5EEy3qqRRfP9rMMMbbgDOJvUhSsS9Z2ykWRlp/5Z.ywTfqOYcIZ.",
+    "name": "Jheyson Wily",
+    "lastname": "Vilca Mamani",
+    "email": "jheyson@gmail.com",
+    "phone": null,
+    "dni": "73312752",
+    "age": 21,
+    "roleId": 2,
+    "areaId": null,
+    "status": true,
+    "createdAt": "2024-10-21T15:48:29.761Z",
+    "updatedAt": "2024-10-22T02:53:39.775Z",
+    "role": {
+      "id": 2,
+      "name": "admin",
+      "createdAt": "2024-10-22T00:53:52.201Z",
+      "updatedAt": "2024-10-22T00:53:52.201Z"
+    },
+    "area": null
+  }
+]
