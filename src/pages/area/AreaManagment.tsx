@@ -1,4 +1,4 @@
-import { CreateUser, User } from "@/types";
+import { Area, CreateArea, User } from "@/types";
 import { FC, useState } from "react";
 
 import {
@@ -26,14 +26,6 @@ import {
 } from "@/components/ui/dialog";
 
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
@@ -55,10 +47,8 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { Label } from "@/components/ui/label";
-import { useRoles } from "@/hooks";
-import { useAreas } from "@/hooks";
+import { useUsers } from "@/hooks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createUser } from "@/service";
 import {
   Tooltip,
   TooltipContent,
@@ -66,51 +56,25 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Link } from "react-router-dom";
-import { UserDelete } from "./UserDelete";
+import { createArea } from "@/service/area.service";
+import { AreaDelete } from "./AreaDelete";
+import { SearchDropdown } from "@/components/shared/SearchDropdownProps";
 
 // Column helper for Persons type
-const columnHelper = createColumnHelper<User>();
+const columnHelper = createColumnHelper<Area>();
 
 interface Props {
-  data: User[];
+  data: Area[];
 }
 
-export const UserManagment: FC<Props> = ({ data }) => {
+export const AreaManagment: FC<Props> = ({ data }) => {
+  console.log(data);
+
   const queryClient = useQueryClient();
   // Define columns
   const columns = [
     columnHelper.accessor("name", {
       header: () => <span>Name</span>,
-      cell: (info) => info.getValue(),
-      footer: (info) => info.column.id,
-      // enableResizing: true,
-    }),
-    columnHelper.accessor("lastname", {
-      header: () => <span>Lastname</span>,
-      cell: (info) => info.getValue(),
-      footer: (info) => info.column.id,
-      // enableResizing: true,
-    }),
-    columnHelper.accessor("dni", {
-      header: () => <span>DNI</span>,
-      cell: (info) => info.getValue(),
-      footer: (info) => info.column.id,
-      // enableResizing: true,
-    }),
-    columnHelper.accessor("email", {
-      header: () => <span>Email</span>,
-      cell: (info) => info.getValue(),
-      footer: (info) => info.column.id,
-      // enableResizing: true,
-    }),
-    columnHelper.accessor("phone", {
-      header: () => <span>Phone</span>,
-      cell: (info) => info.getValue(),
-      footer: (info) => info.column.id,
-      // enableResizing: true,
-    }),
-    columnHelper.accessor("role.name", {
-      header: () => <span>Role</span>,
       cell: (info) => info.getValue(),
       footer: (info) => info.column.id,
       // enableResizing: true,
@@ -127,6 +91,18 @@ export const UserManagment: FC<Props> = ({ data }) => {
     //   footer: (info) => info.column.id,
     //   // enableResizing: true,
     // }),
+    columnHelper.accessor(
+      (row) => {
+        return `${row.manager?.name} ${row.manager?.lastname}`;
+      },
+      {
+        id: "encargado",
+        header: () => <span>Encargado</span>,
+        cell: (info) => info.getValue(),
+        footer: (info) => info.column.id,
+        // enableResizing: true,
+      }
+    ),
     columnHelper.accessor("createdAt", {
       header: () => <span>Created At</span>,
       cell: (info) => <DateFormated date={info.getValue()} />,
@@ -143,7 +119,7 @@ export const UserManagment: FC<Props> = ({ data }) => {
                 asChild
                 className="flex items-center cursor-pointer"
               >
-                <Link to={`/user/${row.row.original.id}`}>
+                <Link to={`/area/${row.row.original.id}`}>
                   <ViewIcon size={20} />
                 </Link>
               </TooltipTrigger>
@@ -152,7 +128,7 @@ export const UserManagment: FC<Props> = ({ data }) => {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <UserDelete id={row.row.original.id} />
+          <AreaDelete id={row.row.original.id} />
         </div>
       ),
       footer: (info) => info.column.id,
@@ -193,9 +169,14 @@ export const UserManagment: FC<Props> = ({ data }) => {
   });
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  const { data: roles } = useRoles();
-  const { data: areas } = useAreas();
+  const { data: users } = useUsers();
+  const formattedusers =
+    users?.map((user: User) => {
+      return {
+        id: user.id,
+        name: `${user.name} ${user.lastname}`,
+      };
+    }) || [];
 
   const {
     register,
@@ -203,34 +184,34 @@ export const UserManagment: FC<Props> = ({ data }) => {
     control,
     reset,
     formState: { errors },
-  } = useForm<CreateUser>();
+  } = useForm<CreateArea>();
 
   const mutation = useMutation({
-    mutationFn: async (data: CreateUser) => {
-      const response = await createUser(data);
+    mutationFn: async (data: CreateArea) => {
+      const response = await createArea(data);
       reset();
       return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["users"],
+        queryKey: ["areas"],
         exact: true,
       });
     },
   });
 
-  const onSubmit: SubmitHandler<CreateUser> = async (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<CreateArea> = async (data) => {
     setIsDialogOpen(false);
     const promesa = mutation.mutateAsync(data);
 
     toast.promise(promesa, {
       loading: "Cargando....",
-      success: "Usuario Creado correctamente",
-      error: "Ocurrio un error al crear el usuario",
+      success: "Area Creado correctamente",
+      error: "Ocurrio un error al crear el area",
       duration: 1000,
     });
   };
+
   return (
     // <motion.div
     //   initial={{ opacity: 0, y: -200 }}
@@ -283,147 +264,40 @@ export const UserManagment: FC<Props> = ({ data }) => {
             <DialogTrigger asChild>
               <Button variant={"default"}>
                 <UserAdd01Icon className="w-4 h-4 mr-2" />
-                Crear Usuario
+                Crear Area
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Crear Nuevo Usuario</DialogTitle>
+                <DialogTitle>Crear Nuevo Area</DialogTitle>
                 <DialogDescription>
-                  Ingrese los detalles del nuevo usuario para crear una cuenta.
+                  Ingrese los detalles del nuevo area para crear una cuenta.
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="text-sm font-medium">
-                      Nombre
-                    </Label>
-                    <Input
-                      id="name"
-                      {...register("name", { required: true })}
-                    />
-                    {errors.name && <span>Este campo es requerido</span>}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastname" className="text-sm font-medium">
-                      Apellido
-                    </Label>
-                    <Input
-                      id="lastname"
-                      {...register("lastname", { required: true })}
-                    />
-                    {errors.lastname && <span>Este campo es requerido</span>}
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-sm font-medium">
+                    Nombre
+                  </Label>
+                  <Input id="name" {...register("name", { required: true })} />
+                  {errors.name && <span>Este campo es requerido</span>}
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-sm font-medium">
-                      Correo electrónico
-                    </Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      {...register("email", { required: true })}
-                    />
-                    {errors.email && <span>Este campo es requerido</span>}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-sm font-medium">
-                      Teléfono
-                    </Label>
-                    <Input
-                      id="phone"
-                      {...register("phone", { required: true })}
-                    />
-                    {errors.phone && <span>Este campo es requerido</span>}
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="managerId">Jefe de Area</Label>
+                  <Controller
+                    name="managerId"
+                    control={control}
+                    render={({ field }) => (
+                      <SearchDropdown
+                        {...field}
+                        items={formattedusers}
+                        onChange={(id) => field.onChange(id)}
+                      />
+                    )}
+                  />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="dni" className="text-sm font-medium">
-                      DNI
-                    </Label>
-                    <Input id="dni" {...register("dni", { required: true })} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="age" className="text-sm font-medium">
-                      Edad
-                    </Label>
-                    <Input
-                      id="age"
-                      type="number"
-                      {...register("age", {
-                        required: true,
-                        valueAsNumber: true,
-                      })}
-                    />
-                    {errors.age && <span>Este campo es requerido</span>}
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="roleId" className="text-sm font-medium">
-                      Rol
-                    </Label>
-                    <Controller
-                      name="roleId"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          onValueChange={(value) =>
-                            field.onChange(Number(value))
-                          }
-                          value={field.value?.toString()}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Seleccionar rol" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {roles &&
-                              roles.map((role) => (
-                                <SelectItem key={role.id} value={`${role.id}`}>
-                                  {role.name}
-                                </SelectItem>
-                              ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="areaId" className="text-sm font-medium">
-                      Área
-                    </Label>
-                    <Controller
-                      name="areaId"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          onValueChange={(value) =>
-                            field.onChange(Number(value))
-                          }
-                          value={field.value?.toString()}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Seleccionar area" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {areas &&
-                              areas.map((area) => (
-                                <SelectItem key={area.id} value={`${area.id}`}>
-                                  {area.name}
-                                </SelectItem>
-                              ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                  </div>
-                </div>
-
                 <Button type="submit" className="w-full">
-                  Crear Usuario
+                  Crear Area
                 </Button>
               </form>
             </DialogContent>

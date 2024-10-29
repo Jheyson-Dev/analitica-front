@@ -13,7 +13,7 @@ export const navOptions: NavOption[] = [
     path: "/",
     name: "Dashboard",
     icon: <DashboardSpeed01Icon size={20} />,
-    allowedRoles: ["admin"],
+    allowedRoles: ["admin", "encargado-almacen", "trabajador"],
   },
   {
     path: "/user",
@@ -25,6 +25,24 @@ export const navOptions: NavOption[] = [
     path: "/product",
     name: "Product",
     icon: <DashboardSpeed01Icon size={20} />,
+    allowedRoles: ["admin", "encargado-almacen"],
+  },
+  {
+    path: "/area",
+    name: "Area",
+    icon: <DashboardSpeed01Icon size={20} />,
     allowedRoles: ["admin"],
+  },
+  {
+    path: "/warehouse",
+    name: "Warehouse",
+    icon: <DashboardSpeed01Icon size={20} />,
+    allowedRoles: ["admin"],
+  },
+  {
+    path: "/kardex",
+    name: "Kardex",
+    icon: <DashboardSpeed01Icon size={20} />,
+    allowedRoles: ["admin", "encargado-almacen", "trabajador"],
   },
 ];

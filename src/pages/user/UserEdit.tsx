@@ -14,7 +14,6 @@ import { useAreas, useRoles, useUser } from "@/hooks";
 import { updateUser } from "@/service";
 import { CreateUser, User } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Search01Icon } from "hugeicons-react";
 import { useEffect } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
@@ -27,8 +26,6 @@ export const UserEdit: React.FC = () => {
   const { data: roles } = useRoles();
   const { data: areas } = useAreas();
   const navigate = useNavigate();
-
-  console.log(user);
 
   const {
     register,
@@ -53,7 +50,6 @@ export const UserEdit: React.FC = () => {
   });
 
   const onSubmit: SubmitHandler<User> = async (data: User) => {
-    console.log(data);
     const promesa = mutation.mutateAsync(data);
     toast.promise(promesa, {
       loading: "Actualizando usuario...",

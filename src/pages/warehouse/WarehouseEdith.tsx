@@ -1,9 +1,15 @@
-import { useProduct } from "@/hooks";
+import { useAreas, useWarehouse } from "@/hooks";
 import { LoadingOverlay } from "@/components/shared/LoadingOverlay";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 // import { Search01Icon } from "hugeicons-react";
@@ -11,41 +17,47 @@ import { FC, useEffect } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
-import { Product } from "@/types";
-import { updateProduct } from "@/service/product.service";
+import { Warehouse } from "@/types";
+import { updateWarehouse } from "@/service";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-export const ProductEdith: FC = () => {
+export const WarehouseEdith: FC = () => {
   const queryClient = useQueryClient();
 
   const { id } = useParams();
-  const { data: product, isLoading } = useProduct(Number(id));
+  const { data: warehouse, isLoading } = useWarehouse(Number(id));
+  const { data: areas } = useAreas();
   const navigate = useNavigate();
-
-  console.log(product);
 
   const {
     register,
     handleSubmit,
     setValue,
     control,
-    // formState: { errors },
-  } = useForm<Product>();
+    formState: { errors },
+  } = useForm<Warehouse>();
 
   const mutation = useMutation({
-    mutationFn: async (data: Product) => {
-      const response = await updateProduct(Number(id), data);
+    mutationFn: async (data: Warehouse) => {
+      const response = await updateWarehouse(Number(id), data);
       return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["products"],
+        queryKey: ["warehouses"],
         exact: true,
       });
-      navigate("/product");
+      navigate("/warehouse");
     },
   });
 
-  const onSubmit: SubmitHandler<Product> = async (data: Product) => {
+  const onSubmit: SubmitHandler<Warehouse> = async (data: Warehouse) => {
     console.log(data);
     const promesa = mutation.mutateAsync(data);
     toast.promise(promesa, {
@@ -55,22 +67,20 @@ export const ProductEdith: FC = () => {
       duration: 1000,
     });
   };
-
   useEffect(() => {
-    if (product) {
-      setValue("name", product?.name);
-      setValue("description", product?.description);
-      setValue("price", product?.price);
-      setValue("status", product?.status);
+    if (warehouse) {
+      setValue("name", warehouse?.name);
+      setValue("location", warehouse?.location);
+      setValue("status", warehouse?.status);
+      setValue("areaId", warehouse?.areaId);
     }
-  }, [product, setValue]);
-
+  }, [warehouse, setValue]);
   return (
     <div>
       {isLoading && <LoadingOverlay />}
 
-      <div className="flex justify-between py-4 text-xl font-semibold">
-        Product Edit
+      <div className="flex justify-between p-4 text-xl font-semibold">
+        Editar Almacen
         {/* <div className="flex gap-4">
           <div className="relative w-full max-w-sm">
             <Search01Icon className="absolute w-4 h-4 text-gray-400 -translate-y-1/2 left-3 top-1/2" />
@@ -85,7 +95,7 @@ export const ProductEdith: FC = () => {
         </div> */}
       </div>
       <div>
-        {product && (
+        {warehouse && (
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="grid grid-cols-2 gap-4"
@@ -95,18 +105,51 @@ export const ProductEdith: FC = () => {
               <Input id="name" {...register("name")} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Input id="description" {...register("description")} />
+              <Label htmlFor="location">Location</Label>
+              <Input id="location" {...register("location")} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="price">price</Label>
-              <Input
-                id="price"
-                type="number"
-                {...register("price", { valueAsNumber: true })}
+              <Label htmlFor="areaId" className="text-left">
+                Area :
+              </Label>
+              <Controller
+                name="areaId"
+                control={control}
+                render={({ field }) => (
+                  <div
+                    className={`col-span-3 ${
+                      errors.areaId
+                        ? "border-error focus-visible:ring-error"
+                        : ""
+                    }
+                      }`}
+                  >
+                    <Select
+                      onValueChange={(value) => field.onChange(Number(value))}
+                      value={field.value?.toString()}
+                      defaultValue={field.value?.toString()}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Seleccione el area" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {areas &&
+                          areas.map((area) => (
+                            <SelectItem key={area.id} value={`${area.id}`}>
+                              {area.name}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               />
+              {errors.areaId && (
+                <p className="col-span-3 col-start-2 text-sm font-semibold text-error">
+                  {errors.areaId.message}
+                </p>
+              )}
             </div>
-
             <div className="space-y-2 ">
               <Label htmlFor="status" className="flex my-2 ">
                 Status
@@ -126,51 +169,6 @@ export const ProductEdith: FC = () => {
                 )}
               />
             </div>
-
-            {/* POSIBLE CATEGORIA */}
-            {/* <div className="space-y-2">
-              <Label htmlFor="roleId" className="text-left">
-                Rol :
-              </Label>
-              <Controller
-                name="roleId"
-                control={control}
-                render={({ field }) => (
-                  <div
-                    className={`col-span-3 ${
-                      errors.roleId
-                        ? "border-error focus-visible:ring-error"
-                        : ""
-                    }
-                      }`}
-                  >
-                    <Select
-                      onValueChange={(value) => field.onChange(Number(value))}
-                      value={field.value?.toString()}
-                      defaultValue={field.value?.toString()}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Seleccione el rol" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {roles &&
-                          roles.map((role) => (
-                            <SelectItem key={role.id} value={`${role.id}`}>
-                              {role.name}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-              />
-              {errors.roleId && (
-                <p className="col-span-3 col-start-2 text-sm font-semibold text-error">
-                  {errors.roleId.message}
-                </p>
-              )}
-            </div> */}
-
             <div className="flex col-span-2 gap-4">
               <Button
                 className="bg-error text-foreground"

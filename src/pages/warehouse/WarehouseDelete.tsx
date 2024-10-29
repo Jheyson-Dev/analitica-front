@@ -20,40 +20,40 @@ import {
 import { Delete02Icon } from "hugeicons-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { deleteProduct } from "@/service";
 import { toast } from "sonner";
+import { deleteWarehouse } from "@/service";
 
 interface Props {
   id: number;
 }
-export const ProductDelete: FC<Props> = ({ id }) => {
+
+export const WarehouseDelete: FC<Props> = ({ id }) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const response = await deleteProduct(id);
+      const response = await deleteWarehouse(id);
       return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["products"],
+        queryKey: ["warehouses"],
         exact: true,
       });
-      navigate("/product");
+      navigate("/warehouse");
     },
   });
 
   const handleDelete = async () => {
     const promesa = mutation.mutateAsync();
     toast.promise(promesa, {
-      loading: "Eliminando producto...",
-      success: "Producto eliminado",
-      error: "Error al eliminar producto",
+      loading: "Eliminando almecen...",
+      success: "Almecen eliminado",
+      error: "Error al eliminar almecen",
       duration: 1000,
     });
   };
-
   return (
     <Dialog>
       <TooltipProvider>
@@ -70,7 +70,7 @@ export const ProductDelete: FC<Props> = ({ id }) => {
       </TooltipProvider>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Eliminar Producto</DialogTitle>
+          <DialogTitle>Eliminar Almacen</DialogTitle>
           <DialogDescription>
             Enter the details of the new user here. Click save when you're done.
           </DialogDescription>

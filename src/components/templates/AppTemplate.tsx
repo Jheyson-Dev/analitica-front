@@ -1,6 +1,6 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
-import { Toaster } from "sonner";
+import { toast, Toaster } from "sonner";
 import { useThemeStore, useBodyClass } from "@/store/themeStore";
 
 import logoDark from "@/assets/logo-dark.svg";
@@ -23,7 +23,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useProfile } from "@/hooks";
+import { io, Socket } from "socket.io-client";
+import { Button } from "../ui/button";
+import { BellDot } from "lucide-react";
+
+const SOCKET_SERVER_URL = import.meta.env.VITE_API_URL;
 
 const AppTemplate: FC = () => {
   const { theme, toggleTheme } = useThemeStore();
@@ -33,6 +43,7 @@ const AppTemplate: FC = () => {
   const { data: profile } = useProfile(Number(user?.id));
 
   const [isAsideOpen, setIsAsideOpen] = useState(true);
+  const socketRef = useRef<Socket | null>(null);
 
   const toggleAside = () => {
     setIsAsideOpen(!isAsideOpen);
@@ -43,6 +54,67 @@ const AppTemplate: FC = () => {
   const filteredOptionsNav = navOptions.filter(
     (option) => user?.role && option.allowedRoles.includes(user?.role)
   );
+
+  const [notifications, setNotifications] = useState<
+    {
+      id: number;
+      message: string;
+      createdAt: string;
+      isRead: boolean;
+      productId: number;
+      quantity: number;
+      warehouseId: number;
+    }[]
+  >([]);
+
+  useEffect(() => {
+    const socket = io(SOCKET_SERVER_URL);
+    socketRef.current = socket;
+    socket.on("connect", () => {
+      console.log("Connected to socket server");
+    });
+
+    socket.emit("register", Number(user?.id));
+
+    socket.on("disconnect", () => {
+      console.log("Disconnected from socket server");
+    });
+
+    // Listen for notifications
+    socket.on("receiveNotification", (notification) => {
+      console.log("Notification received:", notification);
+      setNotifications((prevNotifications) => [
+        ...prevNotifications,
+        notification,
+      ]);
+      // toast.success(`Notification: ${notification.message}`, {
+      //   duration: 2000,
+      // });
+    });
+
+    // Clean up the connection when the component unmounts
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  const markAsRead = (id: number) => {
+    setNotifications((prevNotifications) =>
+      prevNotifications.map((notification) =>
+        notification.id === id
+          ? { ...notification, isRead: true }
+          : notification
+      )
+    );
+
+    if (socketRef.current) {
+      socketRef.current.emit("markAsRead", id);
+    }
+  };
+
+  const unreadCount = notifications.filter(
+    (notification) => !notification.isRead
+  ).length;
 
   return (
     <div>
@@ -70,6 +142,39 @@ const AppTemplate: FC = () => {
           >
             {theme === "dark" ? <Sun03Icon /> : <Moon02Icon />}
           </div>
+        </div>
+        <div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon" className="relative">
+                <BellDot className="w-5 h-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-0 right-0 flex items-center justify-center w-4 h-4 text-xs text-white bg-red-500 rounded-full">
+                    {unreadCount}
+                  </span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80">
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Notifications</h3>
+                {notifications.map((notification) => (
+                  <div
+                    key={notification.id}
+                    className={`p-3 rounded-lg ${
+                      notification.isRead ? "bg-background" : "bg-muted"
+                    }`}
+                    onClick={() => markAsRead(notification.id)}
+                  >
+                    <p className="text-sm">{notification.message}</p>
+                    <p className="text-xs text-gray-500">
+                      {new Date(notification.createdAt).toLocaleString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
         <div className="flex items-center justify-end flex-1">
           <DropdownMenu>
@@ -104,6 +209,17 @@ const AppTemplate: FC = () => {
                 </NavLink>
               </DropdownMenuItem>
               {/* <DropdownMenuSeparator /> */}
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>
+                <div className="font-medium text-md">Notificaciones</div>
+              </DropdownMenuLabel>
+              <div className="overflow-y-auto max-h-60">
+                {notifications.map((notification, index) => (
+                  <div key={index} className="p-2 border-b">
+                    {notification.message}
+                  </div>
+                ))}
+              </div>
               <DropdownMenuItem
                 onClick={logout}
                 className="cursor-pointer hover:bg-accent"

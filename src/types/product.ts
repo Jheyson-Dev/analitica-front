@@ -1,3 +1,6 @@
+import { Inventory } from "./inventory";
+import { Kardex } from "./kardex";
+
 export interface Product {
   id: number;
   name: string;
@@ -6,8 +9,8 @@ export interface Product {
   status: boolean;
   createdAt: Date;
   updatedAt: Date;
-  //   inventory: Inventory[];
-  //   kardex: Kardex[];
+  inventory: Inventory[];
+  kardex: Kardex[];
   //   transfer: Transfer[];
   //   stockNotification: StockNotification;
   options?: any;

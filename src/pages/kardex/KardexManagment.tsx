@@ -41,137 +41,76 @@ import {
   getPaginationRowModel,
   PaginationState,
 } from "@tanstack/react-table";
-import { StatusIndicator } from "@/components/shared/StatusIndicator";
-import { DateFormated } from "@/components/shared/DateFormated";
 import {
-  Edit01Icon,
-  Edit02Icon,
   FilterHorizontalIcon,
   Search01Icon,
   UserAdd01Icon,
-  ViewIcon,
 } from "hugeicons-react";
 import { Input } from "@/components/ui/input";
 // import { motion } from "framer-motion";
 import { toast } from "sonner";
 import {
+  Controller,
   // Controller,
   SubmitHandler,
   useForm,
 } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+import { createKardex } from "@/service/product.service";
+import { CreateKardex, Kardex, Product, Warehouse } from "@/types";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Link } from "react-router-dom";
-import { CreateProduct, Product } from "@/types";
-import { createProduct } from "@/service/product.service";
-import { Textarea } from "@/components/ui/textarea";
-import { ProductDelete } from "./ProductDelete";
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useProducts, useWarehouses } from "@/hooks";
+import moment from "moment";
+import { SearchDropdown } from "@/components/shared/SearchDropdownProps";
 
 // Column helper for Persons type
-const columnHelper = createColumnHelper<Product>();
+const columnHelper = createColumnHelper<Kardex>();
 
 interface Props {
-  data: Product[];
+  data: Kardex[];
 }
 
-export const ProductManagment: FC<Props> = ({ data }) => {
+export const KardexManagment: FC<Props> = ({ data }) => {
   const queryClient = useQueryClient();
-  console.log(data);
 
   const columns = [
-    columnHelper.accessor("name", {
-      header: () => <span>Name</span>,
-      cell: (info) => info.getValue(),
-      footer: (info) => info.column.id,
-      // enableResizing: true,
-    }),
-    columnHelper.accessor("description", {
-      header: () => <span>Drscription</span>,
-      cell: (info) => info.getValue(),
-      footer: (info) => info.column.id,
-      // enableResizing: true,
-    }),
-    columnHelper.accessor(
-      (row) => {
-        return row.inventory.reduce((total, item) => total + item.quantity, 0);
+    columnHelper.accessor("movementDate", {
+      header: () => <span>Fecha de Movimiento</span>,
+      cell: (info) => {
+        return (
+          <span>
+            {moment(info.getValue()).format("MMMM Do YYYY, h:mm:ss a")}
+          </span>
+        );
       },
-      {
-        id: "stock",
-        header: () => <span>Stock</span>,
-        cell: (info) => info.getValue(),
-        footer: (info) => info.column.id,
-        // enableResizing: true,
-      }
-    ),
-    columnHelper.accessor("price", {
-      header: () => <span>Price</span>,
+      footer: (info) => info.column.id,
+      // enableResizing: true,
+    }),
+    columnHelper.accessor("product.name", {
+      header: () => <span>Producto</span>,
       cell: (info) => info.getValue(),
       footer: (info) => info.column.id,
       // enableResizing: true,
     }),
-    columnHelper.accessor("status", {
-      header: () => <span>Status</span>,
-      cell: (info) => <StatusIndicator status={info.getValue()} />,
+    columnHelper.accessor("quantity", {
+      header: () => <span>Cantidad</span>,
+      cell: (info) => info.getValue(),
       footer: (info) => info.column.id,
       // enableResizing: true,
     }),
-    // columnHelper.accessor("rol", {
-    //   header: () => <span>Rol</span>,
-    //   cell: (row) => <div>{row.row.original.user?.roles[0]?.rol?.name}</div>,
-    //   footer: (info) => info.column.id,
-    //   // enableResizing: true,
-    // }),
-    columnHelper.accessor("createdAt", {
-      header: () => <span>Created At</span>,
-      cell: (info) => <DateFormated date={info.getValue()} />,
+    columnHelper.accessor("movementType", {
+      header: () => <span>Tipo Movimiento</span>,
+      cell: (info) => info.getValue(),
       footer: (info) => info.column.id,
-      // enableResizing: true,
-    }),
-    columnHelper.accessor("options", {
-      header: () => <span>Actions</span>,
-      cell: (row) => (
-        <div className="flex items-center gap-4">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger
-                asChild
-                className="flex items-center cursor-pointer"
-              >
-                <Link to={`/product/${row.row.original.id}`}>
-                  <Edit02Icon size={20} />
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Edit</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger
-                asChild
-                className="flex items-center cursor-pointer"
-              >
-                <Link to={`/product/${row.row.original.id}/details`}>
-                  <ViewIcon size={20} />
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>View</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <ProductDelete id={row.row.original.id} />
-        </div>
-      ),
-      footer: (info) => info.column.id,
-      // cell: (row) => <PersonEdit id={row.row.original.id} />,
       // enableResizing: true,
     }),
   ];
@@ -209,39 +148,55 @@ export const ProductManagment: FC<Props> = ({ data }) => {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  const { data: products } = useProducts();
+  const { data: warehouses } = useWarehouses();
+
   const {
     register,
     handleSubmit,
-    // control,
+    control,
     reset,
     formState: { errors },
-  } = useForm<CreateProduct>();
+  } = useForm<CreateKardex>();
 
   const mutation = useMutation({
-    mutationFn: async (data: CreateProduct) => {
-      const response = await createProduct(data);
+    mutationFn: async (data: CreateKardex) => {
+      const response = await createKardex(data);
       reset();
       return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["products"],
+        queryKey: ["kardexs"],
         exact: true,
       });
     },
   });
-  const onSubmit: SubmitHandler<CreateProduct> = async (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<CreateKardex> = async (data) => {
     setIsDialogOpen(false);
     const promesa = mutation.mutateAsync(data);
 
     toast.promise(promesa, {
       loading: "Cargando....",
       success: "Producto Creado correctamente",
-      error: "Ocurrio un error al crear el producto",
-      duration: 1000,
+      error: (error) => {
+        return `${error.response.data.message}`;
+      },
+      duration: 2000,
     });
   };
+
+  const formattedProducts =
+    products?.map((product: Product) => ({
+      id: product.id,
+      name: product.name,
+    })) || [];
+
+  const formattedWarehouses =
+    warehouses?.map((warehouse: Warehouse) => ({
+      id: warehouse.id,
+      name: warehouse.name,
+    })) || [];
 
   return (
     // <motion.div
@@ -295,57 +250,91 @@ export const ProductManagment: FC<Props> = ({ data }) => {
             <DialogTrigger asChild>
               <Button variant={"default"}>
                 <UserAdd01Icon className="w-4 h-4 mr-2" />
-                Crear Producto
+                Crear Kardex
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Crear Nuevo Producto</DialogTitle>
+                <DialogTitle>Crear Nuevo Kardex</DialogTitle>
                 <DialogDescription>
-                  Ingrese los detalles del nuevo producto a crear.
+                  Ingrese los detalles del nuevo kardex a crear.
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="text-sm font-medium">
-                      Nombre
-                    </Label>
-                    <Input
-                      id="name"
-                      {...register("name", { required: true })}
+                    <Label htmlFor="productId">Product</Label>
+                    <Controller
+                      name="productId"
+                      control={control}
+                      render={({ field }) => (
+                        <SearchDropdown
+                          {...field}
+                          items={formattedProducts}
+                          onChange={(id) => field.onChange(id)}
+                        />
+                      )}
                     />
-                    {errors.name && <span>Este campo es requerido</span>}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="price" className="text-sm font-medium">
-                      Price
+                    <Label htmlFor="warehouseId">Destination Warehouse</Label>
+                    <Controller
+                      name="warehouseId"
+                      control={control}
+                      render={({ field }) => (
+                        <SearchDropdown
+                          {...field}
+                          items={formattedWarehouses}
+                          onChange={(id) => field.onChange(id)}
+                        />
+                      )}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="quantity" className="text-sm font-medium">
+                      Quantity
                     </Label>
                     <Input
-                      id="price"
+                      id="quantity"
                       type="number"
-                      {...register("price", {
+                      {...register("quantity", {
                         required: true,
                         valueAsNumber: true,
                       })}
                     />
-                    {errors.price && <span>Este campo es requerido</span>}
+                    {errors.quantity && <span>Este campo es requerido</span>}
                   </div>
-                  <div className="col-span-2 space-y-2">
-                    <Label
-                      htmlFor="description"
-                      className="text-sm font-medium"
-                    >
-                      Descripcion
-                    </Label>
-                    <Textarea
-                      className="resize-none"
-                      rows={4}
-                      id="description"
-                      {...register("description", {})}
-                    />
-                    {errors.description && <span>Este campo es requerido</span>}
-                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="movementType"
+                    className="font-semibold text-md"
+                  >
+                    Transaction Type
+                  </Label>
+                  <Controller
+                    name="movementType"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        onValueChange={(value) => field.onChange(value)}
+                        // onValueChange={() => field.onChange()}
+                      >
+                        <SelectTrigger className="">
+                          <SelectValue placeholder="Select transaction type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectItem value="IN">In</SelectItem>
+                            <SelectItem value="OUT">Out</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
                 </div>
 
                 {/* <div className="space-y-2">

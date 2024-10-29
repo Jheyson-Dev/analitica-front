@@ -4,3 +4,5 @@ export * from "./user";
 export * from "./area";
 export * from "./log";
 export * from "./product";
+export * from "./warehouse";
+export * from "./kardex";

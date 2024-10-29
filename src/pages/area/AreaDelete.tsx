@@ -1,4 +1,3 @@
-import { FC } from "react";
 //  IMPORT DE LOS COMPONENTES DE SHADCN
 import { Button } from "@/components/ui/button";
 import {
@@ -17,43 +16,44 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Delete02Icon } from "hugeicons-react";
+import { deleteArea } from "@/service/area.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Delete02Icon } from "hugeicons-react";
+import { FC } from "react";
 import { useNavigate } from "react-router-dom";
-import { deleteProduct } from "@/service";
 import { toast } from "sonner";
 
 interface Props {
   id: number;
 }
-export const ProductDelete: FC<Props> = ({ id }) => {
+
+export const AreaDelete: FC<Props> = ({ id }) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const response = await deleteProduct(id);
+      const response = await deleteArea(id);
       return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["products"],
+        queryKey: ["areas"],
         exact: true,
       });
-      navigate("/product");
+      navigate("/area");
     },
   });
 
   const handleDelete = async () => {
     const promesa = mutation.mutateAsync();
     toast.promise(promesa, {
-      loading: "Eliminando producto...",
-      success: "Producto eliminado",
-      error: "Error al eliminar producto",
+      loading: "Eliminando area...",
+      success: "Area eliminada",
+      error: "Error al eliminar area",
       duration: 1000,
     });
   };
-
   return (
     <Dialog>
       <TooltipProvider>
@@ -64,13 +64,13 @@ export const ProductDelete: FC<Props> = ({ id }) => {
             </DialogTrigger>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Eliminar</p>
+            <p>Delete</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Eliminar Producto</DialogTitle>
+          <DialogTitle>Delete Area</DialogTitle>
           <DialogDescription>
             Enter the details of the new user here. Click save when you're done.
           </DialogDescription>

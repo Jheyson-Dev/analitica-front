@@ -23,6 +23,7 @@ import moment from "moment";
 export const Profile: FC = () => {
   const { user } = useAuthStore();
   const { data: profile } = useProfile(Number(user?.id));
+  console.log(profile);
 
   return (
     <div className="container p-6 mx-auto">
