@@ -43,7 +43,6 @@ import {
   PaginationState,
 } from "@tanstack/react-table";
 import { StatusIndicator } from "@/components/shared/StatusIndicator";
-import { DateFormated } from "@/components/shared/DateFormated";
 import {
   FilterHorizontalIcon,
   Search01Icon,
@@ -127,12 +126,18 @@ export const UserManagment: FC<Props> = ({ data }) => {
     //   footer: (info) => info.column.id,
     //   // enableResizing: true,
     // }),
-    columnHelper.accessor("createdAt", {
-      header: () => <span>Created At</span>,
-      cell: (info) => <DateFormated date={info.getValue()} />,
+    columnHelper.accessor("area.name", {
+      header: () => <span>Area</span>,
+      cell: (info) => info.getValue(),
       footer: (info) => info.column.id,
       // enableResizing: true,
     }),
+    // columnHelper.accessor("createdAt", {
+    //   header: () => <span>Created At</span>,
+    //   cell: (info) => <DateFormated date={info.getValue()} />,
+    //   footer: (info) => info.column.id,
+    //   // enableResizing: true,
+    // }),
     columnHelper.accessor("options", {
       header: () => <span>Actions</span>,
       cell: (row) => (

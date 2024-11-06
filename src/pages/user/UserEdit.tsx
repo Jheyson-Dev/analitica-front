@@ -27,6 +27,8 @@ export const UserEdit: React.FC = () => {
   const { data: areas } = useAreas();
   const navigate = useNavigate();
 
+  console.log(user);
+
   const {
     register,
     handleSubmit,

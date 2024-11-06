@@ -1,0 +1,5 @@
+{
+  "message": "Error creating user: \nInvalid `this.prisma.user.create()` invocation in\nD:\\jheyson\\projects\\back\\src\\user\\user.service.ts:21:43\n\n  18 const saltRounds = 10;\n  19 const hashedPassword = await bcrypt.hash(data.dni, saltRounds);\n  20 \n→ 21 const user = await this.prisma.user.create(\nUnique constraint failed on the fields: (`email`)",
+  "error": "Internal Server Error",
+  "statusCode": 500
+}

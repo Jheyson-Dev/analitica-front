@@ -58,7 +58,7 @@ export const Profile: FC = () => {
               </div>
               <div className="flex items-center">
                 <Calendar01Icon className="w-4 h-4 mr-2 text-muted-foreground" />
-                <span>Age: {profile?.dni}</span>
+                <span>DNI: {profile?.dni}</span>
               </div>
             </div>
           </CardContent>

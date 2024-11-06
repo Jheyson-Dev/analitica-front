@@ -117,7 +117,7 @@ const AppTemplate: FC = () => {
   ).length;
 
   return (
-    <div>
+    <div className="scrollbar-thumb-sky-700 scrollbar-track-sky-300">
       <header className="sticky top-0 z-10 flex items-center justify-between px-10 py-4 border-b shadow bg-background">
         <div className="items-center justify-start flex-1 hidden space-x-2 max-w-64 md:flex">
           <img src={logo} alt="Sakai Logo" className="w-14 md:w-20" />
@@ -158,20 +158,29 @@ const AppTemplate: FC = () => {
             <PopoverContent className="w-80">
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Notifications</h3>
-                {notifications.map((notification) => (
-                  <div
-                    key={notification.id}
-                    className={`p-3 rounded-lg ${
-                      notification.isRead ? "bg-background" : "bg-muted"
-                    }`}
-                    onClick={() => markAsRead(notification.id)}
-                  >
-                    <p className="text-sm">{notification.message}</p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(notification.createdAt).toLocaleString()}
-                    </p>
-                  </div>
-                ))}
+                <div className="grid grid-cols-1 gap-2 overflow-y-auto max-h-96 scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-blue-500 scrollbar-track-transparent scrollbar-hide">
+                  {notifications.slice(0, 50).map((notification) => (
+                    <div
+                      key={notification.id}
+                      className={`p-3 rounded-lg cursor-pointer ${
+                        notification.isRead ? "bg-background" : "bg-muted"
+                      }`}
+                      onClick={() => markAsRead(notification.id)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm">{notification.message}</p>
+                        {/* {notification.type === "ALERT INVENTORY" && (
+                          <span className="px-2 py-1 ml-2 text-xs font-semibold text-white bg-red-500 rounded-full">
+                            ALERT
+                          </span>
+                        )} */}
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        {new Date(notification.createdAt).toLocaleString()}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </PopoverContent>
           </Popover>
@@ -208,18 +217,8 @@ const AppTemplate: FC = () => {
                   <span className="text-md">Perfil</span>
                 </NavLink>
               </DropdownMenuItem>
-              {/* <DropdownMenuSeparator /> */}
               <DropdownMenuSeparator />
-              <DropdownMenuLabel>
-                <div className="font-medium text-md">Notificaciones</div>
-              </DropdownMenuLabel>
-              <div className="overflow-y-auto max-h-60">
-                {notifications.map((notification, index) => (
-                  <div key={index} className="p-2 border-b">
-                    {notification.message}
-                  </div>
-                ))}
-              </div>
+
               <DropdownMenuItem
                 onClick={logout}
                 className="cursor-pointer hover:bg-accent"
@@ -239,7 +238,7 @@ const AppTemplate: FC = () => {
             isAsideOpen ? " p-4 border w-1/3" : " w-0 overflow-hidden"
           }`}
         >
-          <ul className="space-y-2">
+          <ul className="sticky space-y-2 top-28">
             {filteredOptionsNav.map((option) => (
               <li key={option.path}>
                 <NavLink

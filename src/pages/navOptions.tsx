@@ -13,7 +13,15 @@ export const navOptions: NavOption[] = [
     path: "/",
     name: "Dashboard",
     icon: <DashboardSpeed01Icon size={20} />,
-    allowedRoles: ["admin", "encargado-almacen", "trabajador"],
+    allowedRoles: [
+      "admin",
+      "encargado-almacen",
+      "trabajador",
+      "jefe-area",
+      "gerente-municipal",
+      "operador",
+      "jefe-almacen",
+    ],
   },
   {
     path: "/user",
@@ -25,7 +33,7 @@ export const navOptions: NavOption[] = [
     path: "/product",
     name: "Product",
     icon: <DashboardSpeed01Icon size={20} />,
-    allowedRoles: ["admin", "encargado-almacen"],
+    allowedRoles: ["admin", "encargado-almacen", "jefe-area", "jeje-almacen"],
   },
   {
     path: "/area",
@@ -43,6 +51,26 @@ export const navOptions: NavOption[] = [
     path: "/kardex",
     name: "Kardex",
     icon: <DashboardSpeed01Icon size={20} />,
-    allowedRoles: ["admin", "encargado-almacen", "trabajador"],
+    allowedRoles: [
+      "admin",
+      "encargado-almacen",
+      "trabajador",
+      "jefe-area",
+      "jeje-almacen",
+    ],
+  },
+  {
+    path: "/voucher",
+    name: "Voucher",
+    icon: <DashboardSpeed01Icon size={20} />,
+    allowedRoles: [
+      "admin",
+      "encargado-almacen",
+      "trabajador",
+      "jefe-area",
+      "gerente-municipal",
+      "operador",
+      "jefe-almacen",
+    ],
   },
 ];
