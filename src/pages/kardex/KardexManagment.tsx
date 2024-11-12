@@ -72,6 +72,11 @@ import { useProducts, useWarehouses } from "@/hooks";
 import moment from "moment";
 import { SearchDropdown } from "@/components/shared/SearchDropdownProps";
 
+// LIBRERIAS PARA LA EXPORTACION DE ARCHIVOS
+import { saveAs } from "file-saver";
+import Papa from "papaparse";
+import * as XLSX from "xlsx";
+
 // Column helper for Persons type
 const columnHelper = createColumnHelper<Kardex>();
 
@@ -198,6 +203,28 @@ export const KardexManagment: FC<Props> = ({ data }) => {
       name: warehouse.name,
     })) || [];
 
+  // FUNCION PARA EXPORTAR A CSV
+  const exportToCSV = () => {
+    const csv = Papa.unparse(data);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    saveAs(blob, "kardex_data.csv");
+  };
+
+  // FUNCION PARA EXPORTAR A EXCEL
+  const exportToExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Kardex Data");
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const blob = new Blob([excelBuffer], {
+      type: "application/octet-stream",
+    });
+    saveAs(blob, "kardex_data.xlsx");
+  };
+
   return (
     // <motion.div
     //   initial={{ opacity: 0, y: -200 }}
@@ -245,7 +272,13 @@ export const KardexManagment: FC<Props> = ({ data }) => {
             </DropdownMenu>
           </div>
         </div>
-        <div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={exportToCSV}>
+            Exportar CSV
+          </Button>
+          <Button variant="outline" onClick={exportToExcel}>
+            Exportar Excel
+          </Button>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button variant={"default"}>

@@ -8,6 +8,7 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
+  ResponsiveContainer,
 } from "recharts";
 
 interface Props {
@@ -64,20 +65,22 @@ export const KardexGrafic: FC<Props> = ({ data }) => {
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-8">
-      <div className="">
+    <div className="grid grid-cols-1 gap-8">
+      <div className="max-h-72">
         <h1 className="mb-16 text-xl font-semibold">Product Movement</h1>
 
-        <BarChart width={600} height={300} data={dataForChart}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="quantity" fill="#8884d8" />
-        </BarChart>
+        <ResponsiveContainer width="100%">
+          <BarChart width={400} height={300} data={dataForChart}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="quantity" fill="#8884d8" />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
-      <div>
+      {/* <div className="max-h-72">
         <h1 className="mb-4 text-xl font-semibold">
           Product Movement by Date Range
         </h1>
@@ -95,15 +98,18 @@ export const KardexGrafic: FC<Props> = ({ data }) => {
             onChange={(e) => setEndDate(e.target.value)}
           />
         </div>
-        <BarChart width={600} height={300} data={dataForDateRangeChart}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="quantity" fill="#82ca9d" />
-        </BarChart>
-      </div>
+
+        <ResponsiveContainer width="100%">
+          <BarChart width={400} height={300} data={dataForDateRangeChart}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="quantity" fill="#82ca9d" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div> */}
     </div>
   );
 };

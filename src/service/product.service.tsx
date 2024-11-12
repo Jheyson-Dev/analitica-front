@@ -91,3 +91,13 @@ export const updateProductMinStock = async (
     throw error;
   }
 };
+
+export const getProductKardex = async (id: number): Promise<Kardex[]> => {
+  try {
+    const response = await axiosInstance.get(`/product/kardex/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching product kardex: ", error);
+    throw error;
+  }
+};

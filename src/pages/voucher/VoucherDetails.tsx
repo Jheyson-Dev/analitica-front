@@ -58,6 +58,29 @@ export const VoucherDetails = () => {
           </React.Fragment>
         ))}
       </div>
+      <div className="p-4 mt-10 rounded-lg">
+        <h3 className="mb-2 text-lg font-semibold">Leyenda</h3>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="flex items-center">
+            <div className="flex items-center justify-center w-6 h-6 mr-2 bg-green-500 rounded-full">
+              <CheckCircle2 className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-sm">Paso completado</span>
+          </div>
+          <div className="flex items-center">
+            <div className="flex items-center justify-center w-6 h-6 mr-2 bg-blue-500 rounded-full">
+              <Circle className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-sm">Paso actual</span>
+          </div>
+          <div className="flex items-center">
+            <div className="flex items-center justify-center w-6 h-6 mr-2 bg-gray-200 rounded-full">
+              <Circle className="w-4 h-4 text-gray-500" />
+            </div>
+            <span className="text-sm">Paso pendiente</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
