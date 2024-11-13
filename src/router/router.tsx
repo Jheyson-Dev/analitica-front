@@ -295,9 +295,12 @@ export const router = createBrowserRouter([
               <PrivateRoute
                 allowedRoles={[
                   "admin",
+                  "encargado-almacen",
                   "trabajador",
                   "jefe-area",
                   "gerente-municipal",
+                  "operador",
+                  "jefe-almacen",
                 ]}
               >
                 <CreacionVoucher />
@@ -329,7 +332,10 @@ export const router = createBrowserRouter([
                 allowedRoles={[
                   "admin",
                   "encargado-almacen",
+                  "trabajador",
                   "jefe-area",
+                  "gerente-municipal",
+                  "operador",
                   "jefe-almacen",
                 ]}
               >
