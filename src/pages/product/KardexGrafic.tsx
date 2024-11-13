@@ -1,5 +1,5 @@
 import { Product } from "@/types";
-import { FC, useState } from "react";
+import { FC } from "react";
 import {
   BarChart,
   Bar,
@@ -17,8 +17,8 @@ interface Props {
 
 export const KardexGrafic: FC<Props> = ({ data }) => {
   const { kardex } = data;
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  // const [startDate, setStartDate] = useState("");
+  // const [endDate, setEndDate] = useState("");
 
   const inMovements = kardex.filter((item) => item.movementType === "IN");
   const outMovements = kardex.filter((item) => item.movementType === "OUT");
@@ -34,35 +34,38 @@ export const KardexGrafic: FC<Props> = ({ data }) => {
     },
   ];
 
-  const filterByDateRange = (data, start, end) => {
-    return data.filter((item) => {
-      const date = new Date(item.movementDate);
-      return date >= new Date(start) && date <= new Date(end);
-    });
-  };
+  // const filterByDateRange = (data, start, end) => {
+  //   return data.filter((item) => {
+  //     const date = new Date(item.movementDate);
+  //     return date >= new Date(start) && date <= new Date(end);
+  //   });
+  // };
 
-  const filteredMovements = filterByDateRange(kardex, startDate, endDate);
+  // const filteredMovements = filterByDateRange(kardex, startDate, endDate);
 
-  const inMovementsByDate = filteredMovements.filter(
-    (item) => item.movementType === "IN"
-  );
-  const outMovementsByDate = filteredMovements.filter(
-    (item) => item.movementType === "OUT"
-  );
+  // const inMovementsByDate = filteredMovements.filter(
+  //   (item) => item.movementType === "IN"
+  // );
+  // const outMovementsByDate = filteredMovements.filter(
+  //   (item) => item.movementType === "OUT"
+  // );
 
-  const dataForDateRangeChart = [
-    {
-      name: "IN",
-      quantity: inMovementsByDate.reduce((acc, item) => acc + item.quantity, 0),
-    },
-    {
-      name: "OUT",
-      quantity: outMovementsByDate.reduce(
-        (acc, item) => acc + item.quantity,
-        0
-      ),
-    },
-  ];
+  // const dataForDateRangeChart = [
+  //   {
+  //     name: "IN",
+  //     quantity: inMovementsByDate.reduce(
+  //       (acc: any, item: any) => acc + item.quantity,
+  //       0
+  //     ),
+  //   },
+  //   {
+  //     name: "OUT",
+  //     quantity: outMovementsByDate.reduce(
+  //       (acc: any, item: any) => acc + item.quantity,
+  //       0
+  //     ),
+  //   },
+  // ];
 
   return (
     <div className="grid grid-cols-1 gap-8">

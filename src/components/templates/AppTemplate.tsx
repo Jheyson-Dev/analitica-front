@@ -1,6 +1,6 @@
 import { FC, useEffect, useRef, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
-import { toast, Toaster } from "sonner";
+import { Toaster } from "sonner";
 import { useThemeStore, useBodyClass } from "@/store/themeStore";
 
 import logoDark from "@/assets/logo-dark.svg";

@@ -18,7 +18,6 @@ export const VoucherDetails = () => {
   ];
 
   const currentStepIndex = steps.findIndex((step) => !step.signed);
-  const signedStepIndex = steps.filter((step) => step.signed).length;
 
   return (
     <div className="w-full max-w-4xl p-6 mx-auto">

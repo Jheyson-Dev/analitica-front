@@ -4,14 +4,6 @@ import { useParams } from "react-router-dom";
 import { FC } from "react";
 import { LoadingOverlay } from "@/components/shared/LoadingOverlay";
 import { KardexGrafic } from "./KardexGrafic";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 
 export const ProductDetails: FC = () => {
   const { id } = useParams();

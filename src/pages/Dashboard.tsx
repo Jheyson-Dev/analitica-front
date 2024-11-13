@@ -2,12 +2,10 @@ import {
   useAreas,
   usePendingVoucher,
   useProducts,
-  useProfile,
   useUsers,
   useVouchers,
   useWarehouses,
 } from "@/hooks";
-import useAuthStore from "@/store/authStore";
 import {
   BarChart,
   Bar,
@@ -24,7 +22,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UserSearch01Icon } from "hugeicons-react";
 
 const Dashboard: React.FC = () => {
-  const { user } = useAuthStore();
   const { data: pendings } = usePendingVoucher();
   const { data: areas } = useAreas();
   const { data: users } = useUsers();
@@ -36,7 +33,7 @@ const Dashboard: React.FC = () => {
   console.log(pendings);
 
   const groupMovementsByArea = (areas) => {
-    return areas.map((area) => {
+    return areas.map((area: any) => {
       const inMovements =
         area?.warehouse?.Kardex?.filter((item) => item.movementType === "IN") ||
         [];

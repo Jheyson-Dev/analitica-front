@@ -44,7 +44,6 @@ import {
 import { StatusIndicator } from "@/components/shared/StatusIndicator";
 import { DateFormated } from "@/components/shared/DateFormated";
 import {
-  Edit01Icon,
   Edit02Icon,
   FilterHorizontalIcon,
   Search01Icon,

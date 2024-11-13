@@ -9,7 +9,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -47,7 +46,7 @@ export const VoucherPreview = () => {
     },
   });
 
-  const signVoucher = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const signVoucher = () => {
     if (!voucher || !user) return;
 
     let updatedFields = {};
