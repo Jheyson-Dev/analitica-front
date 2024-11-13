@@ -4,6 +4,14 @@ import { useParams } from "react-router-dom";
 import { FC } from "react";
 import { LoadingOverlay } from "@/components/shared/LoadingOverlay";
 import { KardexGrafic } from "./KardexGrafic";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export const ProductDetails: FC = () => {
   const { id } = useParams();
@@ -14,7 +22,7 @@ export const ProductDetails: FC = () => {
       {isLoading && <LoadingOverlay />}
       <div>{product && <LocationProduct data={product ?? []} />}</div>
       <div>{product && <KardexGrafic data={product ?? []} />}</div>
-      {/* <div className="mt-10">
+      <div className="mt-10">
         <h1 className="mb-4 text-xl font-semibold">Movements Product</h1>
         <div className="border rounded-md">
           <Table>
@@ -47,7 +55,7 @@ export const ProductDetails: FC = () => {
             </p>
           )}
         </div>
-      </div> */}
+      </div>
     </div>
   );
 };

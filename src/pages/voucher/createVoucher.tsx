@@ -82,6 +82,7 @@ export const CreacionVoucher = () => {
 
   const onSubmit = async (data: any) => {
     data.requesterId = user?.id;
+    console.log(data);
     const promesa = mutation.mutateAsync(data);
 
     toast.promise(promesa, {
