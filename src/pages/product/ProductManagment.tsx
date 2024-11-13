@@ -375,7 +375,7 @@ export const ProductManagment: FC<Props> = ({ data }) => {
                   />
                 </div> */}
                 <Button type="submit" className="w-full">
-                  Crear Usuario
+                  Crear Producto
                 </Button>
               </form>
             </DialogContent>
